@@ -12,7 +12,7 @@
 
 #include "recipientfilters.h"
 #include "utlvector.h"
-#include "../CSBotControl.h"
+#include "CSBotControl.h"
 
 //extern int g_MaxClients;
 extern bool g_IsConnected[MAXPLAYERS+1];

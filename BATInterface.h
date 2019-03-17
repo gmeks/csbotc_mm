@@ -12,7 +12,7 @@
 
 #ifndef _INCLUDE_BATINTERFACE
 #define _INCLUDE_BATINTERFACE
-#include "ismmplugin.h"
+#include "ISmmPlugin.h"
 
 #define ADMININTERFACE_VERSION 1
 #define ADMININTERFACE_MAXACCESSLENGTHTEXT 20		// This is the maximum length of a "flag" access text.

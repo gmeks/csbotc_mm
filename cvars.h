@@ -14,7 +14,7 @@
 #ifndef _INCLUDE_CVARS_H
 #define _INCLUDE_CVARS_H
 
-#include "hl2sdk/convar.h"
+#include "convar.h"
 
 class CSBVars : public IConCommandBaseAccessor
 {

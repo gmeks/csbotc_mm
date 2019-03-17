@@ -12,10 +12,9 @@
 
 #include "BATMenu.h"
 #include "CSBotControl.h"
-#include "keyvalues.h"
-#include "hl2sdk/recipientfilters.h"
+#include "recipientfilters.h"
 #include "usermessages.h"
-#include "color.h"
+#include "Color.h"
 #include "const.h"
 #include "sh_string.h"
 #include <sh_vector.h>

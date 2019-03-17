@@ -104,7 +104,7 @@ MenuSelectionType CSBotControlMenu::MenuChoice(player_t player, int option)
 	return MENUSELECTION_GOOD;
 }
 
-char *CSBotControlMenu::GetDifficulty()
+char const *CSBotControlMenu::GetDifficulty()
 {
 	int CvarValue = g_pDifficulty->GetInt();
 	switch(CvarValue)
@@ -181,7 +181,7 @@ void CSBotControlMenu::SetNextJoinTeam(int id)
 
 	g_CSBCore.MessagePlayer(0,"[CSBotControl] %s changed the settings to bots only will join: %s team",g_CSBCore.GetPlayerName(id),g_pJoinTeam->GetString());
 }
-char *CSBotControlMenu::GetBoolString(bool MyBool)
+char const * CSBotControlMenu::GetBoolString(bool MyBool)
 {	
 	if(!MyBool)
 		return "Off";
