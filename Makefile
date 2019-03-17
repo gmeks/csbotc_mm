@@ -15,7 +15,7 @@ BINARY = csbotc_mm_i486.so
 
 OBJECTS = cvars.cpp Menu.cpp CSBotControl.cpp SharedFunctions.cpp recipientfilters.cpp BATMenu.cpp
 
-LINK = "$(HL2SDK)/lib/linux/tier1_i486.a" -L"$(HL2SDK)/lib/linux" -lvstdlib_srv -ltier0_srv
+LINK = "$(HL2SDK)/lib/linux/tier1_i486.a" -L"$(HL2SDK)/lib/linux" -lvstdlib_srv -ltier0_srv -lm -ldl -lpthread -static-libgcc -static-libstdc++
 
 HL2PUB = $(HL2SDK)/public
 
@@ -46,7 +46,7 @@ all:
 	$(MAKE) sourcemm
 
 sourcemm: $(OBJ_LINUX)
-	$(CPP) $(LFLAGS) $(OBJ_LINUX) $(LINK) -shared -lm -ldl -lpthread -o$(BIN_DIR)/$(BINARY)
+	$(CPP) $(LFLAGS) $(OBJ_LINUX) $(LINK) -shared -o$(BIN_DIR)/$(BINARY)
 
 debug:	
 	$(MAKE) all DEBUG=true
