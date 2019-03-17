@@ -16,11 +16,11 @@
 
 #include <ISmmPlugin.h>
 #include <sourcehook/sourcehook.h>
-#include "hl2sdk/BATInterface.h"
+#include "BATInterface.h"
 #include <igameevents.h>
-#include "ienginesound.h"
+#include "IEngineSound.h"
 #include <iplayerinfo.h>
-#include "hl2sdk/convar.h"
+#include "convar.h"
 #include "cvars.h"
 #include "const.h"
 
@@ -54,7 +54,7 @@ public:
 		return true;
 	}
 public:
-	int GetApiVersion() { return PLAPI_VERSION; }
+	int GetApiVersion() { return METAMOD_PLAPI_VERSION; }
 public:
 	const char *GetAuthor()
 	{
@@ -97,7 +97,7 @@ public:
 	void ServerActivate(edict_t *pEdictList, int edictCount, int clientMax);
 	//Called when a client uses a command.  Unlike server plugins, it's void.
 	// You can still supercede the gamedll through RETURN_META(MRES_SUPERCEDE).
-	void ClientCommand(edict_t *pEntity);
+	void ClientCommand(edict_t *pEntity, CCommand const &command);
 	//Called on a game tick.  Same definition as server plugins
 	void GameFrame(bool simulating);
 	//Client disconnects - same as server plugins
@@ -113,7 +113,6 @@ public:
 	IPlayerInfoManager *PlayerInfo() { return m_InfoMngr; }
 	IServerPluginHelpers *GetHelpers() {return m_Helpers;}
 	CSBVars GetCSBVar() { return g_CSBVars; }
-	bool HookConCommands(bool ReleaseHook);
 	bool HookCvars();
 
 	void MessagePlayer(int index, const char *msg, ...);
@@ -150,7 +149,7 @@ private:
 
 	void LoadPluginSettings(int clientMax);
 	void GetModName();
-	int GetMsgNum(char *Msg);
+	int GetMsgNum(char const *Msg);
 	void SetupModSpesficInfo();
 
 	void CheckBotCount();

@@ -24,8 +24,8 @@ public:
 	MenuSelectionType MenuChoice(player_t player, int option);
 
 private:
-	char *GetDifficulty();
-	char *GetBoolString(bool MyBool);
+	char const *GetDifficulty();
+	char const *GetBoolString(bool MyBool);
 
 	void SetNextDifficulty(int id);
 	void SetNextChatter(int id);

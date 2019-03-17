@@ -11,16 +11,16 @@
 * Helping on misc errors/functions: BAILOPAN,sslice,devicenull,PMOnoTo,cybermind ( most who idle in #sourcemod on GameSurge realy )
 * ============================ */
 
-#include <oslink.h>
+#include "oslink.h"
 #include "CSBotControl.h"
 #include "time.h"
 #include "cvars.h"
-#include "hl2sdk/convar.h"
+#include "convar.h"
 #include "const.h"
 #include <string.h>
 #include <bitbuf.h>
 #include <ctype.h>
-#include "hl2sdk/recipientfilters.h"
+#include "recipientfilters.h"
 
 #define GAME_DLL 1
 #include "cbase.h"
@@ -140,11 +140,10 @@ void CSBotControl::GetModName()		// This function gets the actual mod name, and 
 	else 
 		g_ModIndex = MOD_NONE;	
 }
-int CSBotControl::GetMsgNum(char *Msg)
+int CSBotControl::GetMsgNum(char const *Msg)
 {
 	char temp[40];
 	int dontdoit=0;
-	int MsgCount = atoi(m_Engine->Cmd_Argv(1));
 	int MaxScan= 20;
 	if(g_ModIndex == MOD_CSTRIKE)
 		MaxScan = 25;
@@ -254,7 +253,7 @@ char* StrUtil::StrRemoveQuotes(char *text)
 	for(int i=0;i<len;i++)
 	{
 		if(text[i] == '\"')
-			text[i] = NULL;
+			text[i] = 0;
 	}
 	return text;
 }

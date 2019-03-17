@@ -11,9 +11,9 @@
 * Helping on misc errors/functions: BAILOPAN,sslice,devicenull,PMOnoTo,cybermind ( most who idle in #sourcemod on GameSurge realy )
 * ============================
 */
-#include "hl2sdk/convar.h"
-#include <oslink.h>
-#include "hl2sdk/BATInterface.h"
+#include "convar.h"
+#include "oslink.h"
+#include "BATInterface.h"
 #include "CSBotControl.h"
 #include "Menu.h"
 #include "meta_hooks.h"
@@ -22,7 +22,7 @@
 #include "BATMenu.h"
 #include <time.h>
 
-#include "hl2sdk/recipientfilters.h"
+#include "recipientfilters.h"
 #include <bitbuf.h>
 
 //This has all of the necessary hook declarations.  Read it!
@@ -140,10 +140,12 @@ void CSBotControl::GameFrame(bool simulating) // We dont hook GameFrame, we leav
 {
 	RETURN_META(MRES_IGNORED);
 }
-void CSBotControl::ClientCommand(edict_t *pEntity)
+void CSBotControl::ClientCommand(edict_t *pEntity, CCommand const &ccmd)
 {
+	if(! (0 < ccmd.ArgC())) RETURN_META(MRES_IGNORED);
+
 	int id = m_Engine->IndexOfEdict(pEntity);
-	const char *command = m_Engine->Cmd_Argv(0);
+	const char *command = ccmd.Arg(0);
 
 	if (strcmp(command,"admin_botmenu") == 0 && g_FoundInterface && m_AdminManager->HasFlag(id,"botmenu"))
 	{
@@ -156,7 +158,8 @@ void CSBotControl::ClientCommand(edict_t *pEntity)
 
 	if (strcmp(command,"menuselect") == 0)
 	{
-		char *arg1 = m_Engine->Cmd_Argv(1);
+		if(! (1 < ccmd.ArgC())) RETURN_META(MRES_IGNORED);
+		char const *arg1 = ccmd.Arg(0);
 		//catch menu commands
 		if (arg1)
 		{
@@ -247,7 +250,6 @@ void CSBotControl::LoadPluginSettings(int clientMax)
 		m_GameEventManager->AddListener(this,"player_spawn",true);
 		m_GameEventManager->AddListener(this,"round_end",true);
 		
-		//HookConCommands(false);
 		bool CvarHooks = HookCvars();
 		if(!CvarHooks || g_ModIndex != MOD_CSTRIKE)
 		{
@@ -270,21 +272,22 @@ bool CSBotControl::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen, 
 {
 	PLUGIN_SAVEVARS();
 
-	GET_V_IFACE_ANY(serverFactory, m_ServerDll, IServerGameDLL, INTERFACEVERSION_SERVERGAMEDLL);
-	GET_V_IFACE_ANY(serverFactory, m_ServerClients, IServerGameClients, INTERFACEVERSION_SERVERGAMECLIENTS);
-	GET_V_IFACE_ANY(serverFactory, m_InfoMngr, IPlayerInfoManager, INTERFACEVERSION_PLAYERINFOMANAGER);
-	GET_V_IFACE_CURRENT(serverFactory, m_BotMngr, IBotManager, INTERFACEVERSION_PLAYERBOTMANAGER);
+	GET_V_IFACE_ANY(GetServerFactory, m_ServerDll, IServerGameDLL, INTERFACEVERSION_SERVERGAMEDLL);
+	GET_V_IFACE_ANY(GetServerFactory, m_ServerClients, IServerGameClients, INTERFACEVERSION_SERVERGAMECLIENTS);
+	GET_V_IFACE_ANY(GetServerFactory, m_InfoMngr, IPlayerInfoManager, INTERFACEVERSION_PLAYERINFOMANAGER);
+	GET_V_IFACE_CURRENT(GetServerFactory, m_BotMngr, IBotManager, INTERFACEVERSION_PLAYERBOTMANAGER);
 
-	GET_V_IFACE_CURRENT(engineFactory, m_Engine, IVEngineServer, INTERFACEVERSION_VENGINESERVER);
-	GET_V_IFACE_CURRENT(engineFactory, m_GameEventManager, IGameEventManager2, INTERFACEVERSION_GAMEEVENTSMANAGER2);
-	GET_V_IFACE_CURRENT(engineFactory, m_ICvar, ICvar, VENGINE_CVAR_INTERFACE_VERSION);
-	GET_V_IFACE_CURRENT(engineFactory, m_Helpers, IServerPluginHelpers, INTERFACEVERSION_ISERVERPLUGINHELPERS);
-	GET_V_IFACE_CURRENT(engineFactory, m_Sound, IEngineSound, IENGINESOUND_SERVER_INTERFACE_VERSION);	
+	GET_V_IFACE_CURRENT(GetEngineFactory, m_Engine, IVEngineServer, INTERFACEVERSION_VENGINESERVER);
+	GET_V_IFACE_CURRENT(GetEngineFactory, m_GameEventManager, IGameEventManager2, INTERFACEVERSION_GAMEEVENTSMANAGER2);
+	GET_V_IFACE_CURRENT(GetEngineFactory, m_ICvar, ICvar, CVAR_INTERFACE_VERSION);
+	GET_V_IFACE_CURRENT(GetEngineFactory, m_Helpers, IServerPluginHelpers, INTERFACEVERSION_ISERVERPLUGINHELPERS);
+	GET_V_IFACE_CURRENT(GetEngineFactory, m_Sound, IEngineSound, IENGINESOUND_SERVER_INTERFACE_VERSION);	
 	
 	//EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CPluginBotManager, IBotManager, , s_BotManager);
 	
 	//Init our cvars/concmds
-	ConCommandBaseMgr::OneTimeInit(&g_CSBVars);
+#warning("fix it")
+	// ConCommandBaseMgr::OneTimeInit(&g_CSBVars);
 
 	//We're hooking the following things as POST, in order to seem like Server Plugins.
 	//However, I don't actually know if Valve has done server plugins as POST or not.
@@ -308,7 +311,7 @@ bool CSBotControl::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxlen, 
 	SH_CALL(m_Engine_CC, &IVEngineServer::LogPrint)("All hooks started!\n");
 	if(late)
 	{
-		LoadPluginSettings(ismm->pGlobals()->maxClients);
+		LoadPluginSettings(ismm->GetCGlobals()->maxClients);
 		LogPrint("[CSBotControl] Late load is not really supported, plugin will function properly after 1 mapchange");
 	}
 	return true;
@@ -331,7 +334,6 @@ bool CSBotControl::Unload(char *error, size_t maxlen)
 	SH_REMOVE_HOOK_MEMFUNC(IServerGameClients, SetCommandClient, m_ServerClients, &g_CSBCore, &CSBotControl::SetCommandClient, true);
 	SH_REMOVE_HOOK_MEMFUNC(IServerGameClients, ClientCommand, m_ServerClients, &g_CSBCore, &CSBotControl::ClientCommand, false);
 
-	//HookConCommands(true);	// Release the say / say_team hooks
 	
 
 	//this, sourcehook does not keep track of.  we must do this.
@@ -398,33 +400,6 @@ void CSBotControl::Client_Authorized(int id)
 	ServerCommand("echo [ForgiveTK Debug]Client_Authorized: %d",id);
 #endif
 }
-bool CSBotControl::HookConCommands(bool ReleaseHook)
-{
-	ConCommandBase *pCmd = m_ICvar->GetCommands();
-	while (pCmd)
-	{
-		if (pCmd->IsCommand() && ( stricmp(pCmd->GetName(),"say") == 0 || stricmp(pCmd->GetName(),"say_team") == 0)) 
-		{
-			pSayCmd = (ConCommand *)pCmd;
-			if(ReleaseHook == false)
-			{
-				//ServerCommand("echo [BAT] Hooking ConCommand: %s",pSayCmd->GetName());
-				SH_ADD_HOOK_STATICFUNC(ConCommand, Dispatch, pSayCmd,Say_handler, false);	
-			}
-			else
-			{
-				//ServerCommand("echo [BAT] Releasing hook on: %s",pSayCmd->GetName());
-				SH_REMOVE_HOOK_STATICFUNC(ConCommand, Dispatch, pSayCmd,Say_handler, false);	
-			}
-		}
-		pCmd = const_cast<ConCommandBase *>(pCmd->GetNext());
-	}
-	if (pSayCmd)
-	{
-		return true;
-	}
-	return false;
-}
 
 bool CSBotControl::HookCvars()
 {
@@ -450,7 +425,8 @@ bool CSBotControl::HookCvars()
 		}
 		pCmd = const_cast<ConCommandBase *>(pCmd->GetNext());
 	}
-	g_pFreeze->SetVarFlags((g_pFreeze->GetVarFlags() - FCVAR_CHEAT));
+#warning("do something better here")
+	// g_pFreeze->SetVarFlags((g_pFreeze->GetVarFlags() - FCVAR_CHEAT));
 	if(!g_pJoinAfterPlayer || !g_pDifficulty || !g_pFreeze|| !g_pChatter )
 		return false;
 	return true;

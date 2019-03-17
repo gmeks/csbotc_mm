@@ -53,10 +53,14 @@ public:
 	virtual void			SetCommandClient( int index ) {};
 	virtual void			ClientSettingsChanged( edict_t *pEdict ) {};
 	virtual PLUGIN_RESULT	ClientConnect( bool *bAllowConnect, edict_t *pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen )  {return PLUGIN_CONTINUE; };
-	virtual PLUGIN_RESULT	ClientCommand( edict_t *pEntity )  {return PLUGIN_CONTINUE; }; 
+	virtual PLUGIN_RESULT	ClientCommand( edict_t *pEntity, CCommand const & )  {return PLUGIN_CONTINUE; }; 
 	virtual PLUGIN_RESULT	NetworkIDValidated( const char *pszUserName, const char *pszNetworkID ) {return PLUGIN_CONTINUE; };
 	virtual void FireGameEvent( KeyValues * event ) {};
 	virtual int GetCommandIndex() { return 0;}
+
+
+	inline virtual void		OnQueryCvarValueFinished( QueryCvarCookie_t, edict_t *, EQueryCvarValueStatus, const char *, const char * ) {};
+
 
 #if BAT_DEBUG == 1
 	//void ShowESCMenu(int id);
