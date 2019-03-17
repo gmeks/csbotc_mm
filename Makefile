@@ -1,19 +1,15 @@
 #(C)2004-2005 SourceMM Development Team
 # Makefile written by David "BAILOPAN" Anderson
 
-HL2SDK = ../sdk/HL2Sdk
-SMM_ROOT = ../sdk/Sourcemm
-
-#HL2SDK = ../../../MyMpd/src
-#SMM_ROOT = ../..
+HL2SDK = ../hl2sdk
+SMM_ROOT = ../metamod-source
 
 ### EDIT BELOW FOR OTHER PROJECTS ###
 
 OPT_FLAGS = -O3 -funroll-loops -s -pipe
 DEBUG_FLAGS = -g -ggdb3
 
-CPP = ../opt/crosstool/gcc-3.4.1-glibc-2.3.2/i686-unknown-linux-gnu/bin/i686-unknown-linux-gnu-gcc
-#CPP = /opt/crosstool/gcc-3.4.1-glibc-2.3.2/i686-unknown-linux-gnu/bin/i686-unknown-linux-gnu-gcc
+CPP = g++
 
 BINARY = csbotc_mm_i486.so
 
